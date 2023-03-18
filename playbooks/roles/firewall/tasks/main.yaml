@@ -1,0 +1,10 @@
+---
+- name: Configure firewalld to allow traffic for Jenkins
+  ansible.posix.firewalld:
+    port: "{{ item.port }}"
+    permanent: "{{ item.permanent }}"
+    state: "{{ item.state }}"
+    zone: "{{ item.zone }}"
+  loop: "{{ firewalld_port_list }}"
+  notify:
+  - Restart firewalld
