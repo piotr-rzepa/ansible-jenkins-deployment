@@ -1,0 +1,10 @@
+---
+- name: Remove Jenkins init scripts
+  ansible.builtin.file:
+    path: "{{ jenkins_home }}/init.groovy.d/basic-security.groovy"
+    state: absent
+
+- name: Restart Jenkins
+  ansible.builtin.systemd:
+    name: jenkins
+    state: restarted

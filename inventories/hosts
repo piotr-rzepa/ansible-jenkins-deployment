@@ -1,13 +1,13 @@
 
 # Jenkins master node
 
-[jenkins-master]
+[jenkins_master]
 192.168.60.4
 
 # Jenkins master + all working nodes
 
 [jenkins:children]
-jenkins-master
+jenkins_master
 
 [jenkins:vars]
 ansible_ssh_user=vagrant

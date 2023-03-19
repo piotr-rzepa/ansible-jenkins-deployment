@@ -1,0 +1,11 @@
+---
+jenkins_master:
+  hostname: jenkins.master
+  ip: "192.168.60.4"
+  resources:
+    memory: "4096"
+    cpus: "2"
+
+ansible:
+  playbook_path: playbooks/provision.yaml
+  inventory_path: inventories/hosts

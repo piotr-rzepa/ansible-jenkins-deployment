@@ -1,0 +1,20 @@
+---
+- name: Get Jenkins CLI jar file from remote server
+  ansible.builtin.get_url:
+    # We're inside a remote
+    url: "http://localhost:{{ jenkins_http_port }}/jnlpJars/jenkins-cli.jar"
+    dest: "{{ jenkins_local_jar_location }}"
+  register: jarfile_acquired
+  until: "'OK' in jarfile_acquired.msg or '304' in jarfile_acquired.msg or 'file already exists' in jarfile_acquired.msg"
+  retries: 5
+  delay: 10
+  check_mode: false
+
+- name: Install plugins using Jenkins CLI
+  become: true
+  ansible.builtin.command:
+    cmd: "java -jar {{ jenkins_local_jar_location }} -s http://localhost:{{ jenkins_http_port }}/ -auth {{ jenkins_admin_username }}:{{ jenkins_admin_password }} install-plugin {{ item.source }}{{ ':' if item.version is defined else '' }}{{ item.version | default('') }}"
+  loop: "{{ jenkins_plugin_list }}"
+  notify:
+  - Restart Jenkins
+
