@@ -1,0 +1,6 @@
+---
+- name: Install Java
+  ansible.builtin.yum:
+    name:
+      - "java-{{ java_version }}-openjdk"
+    state: present
