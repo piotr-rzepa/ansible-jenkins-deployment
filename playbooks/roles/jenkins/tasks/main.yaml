@@ -2,19 +2,14 @@
 - name: Import Jenkins GPG key
   ansible.builtin.rpm_key:
     state: present
-    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    key: "{{ jenkins_gpg_key_url }}"
     validate_certs: false
 
 - name: Add Jenkins RedHat-stable repository
   ansible.builtin.get_url:
-    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    url: "{{ jenkins_repo_url }}"
     dest: /etc/yum.repos.d/jenkins.repo
     validate_certs: false
-
-- name: Upgrade all packages
-  ansible.builtin.yum:
-    name: '*'
-    state: latest
 
 - name: Install jenkins
   ansible.builtin.yum:
@@ -22,23 +17,15 @@
       - jenkins
     state: present
 
-- name: Reload systemctl
-  ansible.builtin.systemd:
-    daemon_reload: true
+- ansible.builtin.include_tasks: init.yaml
 
 - name: Start Jenkins
   ansible.builtin.service:
     name: jenkins
     state: started
     enabled: true
+  notify:
+  - Remove Jenkins init scripts
 
-- name: Get Initial Admin Password
-  ansible.builtin.command: cat /var/lib/jenkins/secrets/initialAdminPassword
-  changed_when: false
-  register: initial_admin_password
-
-- name: Print Initial Admin Password
-  ansible.builtin.debug:
-    var: initial_admin_password.stdout_lines
-
+- ansible.builtin.include_tasks: plugins.yaml
 

@@ -1,0 +1,76 @@
+---
+- name: Check if Jenkins service unit folder exists
+  ansible.builtin.stat:
+    path: "{{ jenkins_init_folder }}"
+  register: init_folder_state
+
+- name: Create Jenkins service unit folder, if not exists
+  ansible.builtin.file:
+    path: "{{ jenkins_init_folder }}"
+    state: directory
+    mode: 0644
+  when: not init_folder_state.stat.exists
+
+- name: Check if Jenkins service unit override config exists
+  ansible.builtin.stat:
+    path: "{{ jenkins_init_file }}"
+  register: init_override_file_state
+
+- name: Create Jenkins service unit override config, if not exists
+  ansible.builtin.file:
+    path: "{{ jenkins_init_file }}"
+    state: touch
+    mode: 0644
+  when: not init_override_file_state.stat.exists
+
+- name: Update values in service unit override config
+  ansible.builtin.lineinfile:
+    dest: "{{ jenkins_init_file }}"
+    insertafter: '^Environment="{{ item.option }}"'
+    regexp: '^Environment="{{ item.option }}"'
+    line: 'Environment="{{ item.option }}={{ item.value }}"'
+    state: present
+    mode: 0644
+  loop: "{{ jenkins_init_options }}"
+  register: override_init_config
+
+- name: Create jenkins home directory, if not exists
+  ansible.builtin.file:
+    path: "{{ jenkins_home }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: 0770
+    follow: true
+
+- name: Create folder for custom groovy init scripts
+  ansible.builtin.file:
+    path: "{{ jenkins_home }}/init.groovy.d"
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: 0775
+
+- name: Configure Jenkins default user(s)
+  ansible.builtin.template:
+    src: basic-security.groovy.j2
+    dest: "{{ jenkins_home }}/init.groovy.d/basic-security.groovy"
+    owner: jenkins
+    group: jenkins
+    mode: 0775
+
+- name: Configure Java logging options
+  ansible.builtin.template:
+    src: logging.properties.j2
+    dest: "{{ jenkins_home }}/logging.properties"
+    owner: jenkins
+    group: jenkins
+    mode: 0755
+
+- name: Restart Jenkins service on changes
+  ansible.builtin.systemd:
+    name: jenkins
+    state: restarted
+    daemon_reload: true
+  when: override_init_config.changed
+
