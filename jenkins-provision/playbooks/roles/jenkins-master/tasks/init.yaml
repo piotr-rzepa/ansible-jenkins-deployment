@@ -51,6 +51,36 @@
     group: jenkins
     mode: 0775
 
+- name: Create directory for storing ssh key
+  ansible.builtin.file:
+    path: ~/.ssh/jenkins
+    state: directory
+    owner: root
+    group: root
+  delegate_to: localhost
+
+- name: Create directory for storing ssh key on remote
+  ansible.builtin.file:
+    path: "{{ jenkins_home }}/.ssh"
+    state: directory
+    owner: jenkins
+    group: jenkins
+
+- name: Generate an SSH keypair locally
+  ansible.builtin.command:
+    cmd: ssh-keygen -q -t rsa -b 2048 -f ~/.ssh/jenkins/id_rsa_jenkins_master
+    creates: ~/.ssh/jenkins/id_rsa_jenkins_*
+  delegate_to: localhost
+
+# TODO: Automate registering agent node using Jenkins CLI
+- name: Upload SSH keypair to Jenkins master server
+  ansible.builtin.copy:
+    src: ~/.ssh/jenkins/
+    dest: "{{ jenkins_home }}/.ssh"
+    owner: jenkins
+    group: jenkins
+    mode: 0700
+
 - name: Configure Jenkins default user(s)
   ansible.builtin.template:
     src: basic-security.groovy.j2

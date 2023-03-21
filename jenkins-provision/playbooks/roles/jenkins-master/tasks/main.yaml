@@ -1,7 +1,7 @@
 ---
 - name: Import Jenkins GPG key
   ansible.builtin.rpm_key:
-    state: present
+    state: "{{ jenkins_gpg_key_state }}"
     key: "{{ jenkins_gpg_key_url }}"
     validate_certs: false
 
@@ -15,7 +15,7 @@
   ansible.builtin.yum:
     name:
       - jenkins
-    state: present
+    state: "{{ jenkins_package_state }}"
 
 - ansible.builtin.include_tasks: init.yaml
 
@@ -23,7 +23,7 @@
   ansible.builtin.service:
     name: jenkins
     state: started
-    enabled: true
+    enabled: "{{ jenkins_start_on_boot }}"
   notify:
   - Remove Jenkins init scripts
 

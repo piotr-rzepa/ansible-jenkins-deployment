@@ -1,0 +1,37 @@
+---
+- name: Install packages
+  ansible.builtin.yum:
+    name:
+      - git
+    state: present
+
+- name: Create Jenkins group
+  ansible.builtin.group:
+    name: jenkins
+    state: present
+
+- name: Create Jenkins user
+  ansible.builtin.user:
+    name: jenkins
+    group: jenkins
+    home: /var/lib/jenkins
+    shell: /bin/bash
+    state: present
+
+- name: Create directory for public SSH key
+  ansible.builtin.file:
+    path: /var/lib/jenkins/.ssh/
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: 0700
+
+- name: Copy public key to Jenkins agent
+  ansible.builtin.copy:
+    src: ~/.ssh/jenkins/id_rsa_jenkins_master.pub
+    dest: /var/lib/jenkins/.ssh/authorized_keys
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+  notify:
+  - Remove local SSH keypair

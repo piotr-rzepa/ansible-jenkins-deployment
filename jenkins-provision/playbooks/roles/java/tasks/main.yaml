@@ -3,4 +3,4 @@
   ansible.builtin.yum:
     name:
       - "java-{{ java_version }}-openjdk"
-    state: present
+    state: "{{ java_package_state }}"

@@ -6,6 +6,13 @@ jenkins_master:
     memory: "4096"
     cpus: "2"
 
+jenkins_agent:
+  hostname: jenkins.agent1
+  ip: "192.168.60.5"
+  resources:
+    memory: "512"
+    cpus: "2"
+
 ansible:
-  playbook_path: playbooks/provision.yaml
+  playbook_path: playbooks/main.yaml
   inventory_path: inventories/hosts

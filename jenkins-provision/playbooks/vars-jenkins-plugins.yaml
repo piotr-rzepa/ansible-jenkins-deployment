@@ -1,25 +1,4 @@
 ---
-jenkins_gpg_key_url: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-jenkins_repo_url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
-jenkins_home: /var/lib/jenkins
-jenkins_http_port: 8080
-jenkins_admin_username: admin
-jenkins_admin_password: admin
-jenkins_java_options: >
-  -Djenkins.install.runSetupWizard=false
-  -Djava.util.logging.config.file="{{ jenkins_home }}"/logging.properties
-  -Dorg.apache.commons.jelly.tags.fmt.timeZone=Poland/Warsaw
-jenkins_init_folder: "/etc/systemd/system/jenkins.service.d"
-jenkins_local_jar_location: /tmp/jenkins-cli.jar
-jenkins_init_file: "{{ jenkins_init_folder }}/override.conf"
-jenkins_log_level: INFO
-jenkins_init_options:
-  - option: "JAVA_OPTS"
-    value: "{{ jenkins_java_options }}"
-  - option: "JENKINS_HOME"
-    value: "{{ jenkins_home }}"
-  - option: "JENKINS_PORT"
-    value: "{{ jenkins_http_port }}"
 jenkins_plugin_list:
   - source: cloudbees-folder
     version: 6.815.v0dd5a_cb_40e0e

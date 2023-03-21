@@ -27,8 +27,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook = config_file["ansible"]["playbook_path"]
-    ansible.inventory_path = config_file["ansible"]["inventory_path"]
+  config.vm.define "jenkins_agent" do |jenkins_agent|
+    jenkins_agent.vm.hostname = config_file["jenkins_agent"]["hostname"]
+    jenkins_agent.vm.network :private_network, ip: config_file["jenkins_agent"]["ip"]
+    jenkins_agent.vm.provider :libvirt do |v|
+      v.memory = config_file["jenkins_agent"]["resources"]["memory"]
+      v.cpus = config_file["jenkins_agent"]["resources"]["cpus"]
+    end
+    jenkins_agent.vm.provision "ansible" do |ansible|
+      ansible.playbook = config_file["ansible"]["playbook_path"]
+      ansible.inventory_path = config_file["ansible"]["inventory_path"]
+      ansible.raw_arguments = ["--forks=1"]
+      ansible.limit = "all"
+    end
   end
 end

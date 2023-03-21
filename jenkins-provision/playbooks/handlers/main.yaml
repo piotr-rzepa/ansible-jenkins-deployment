@@ -1,4 +1,9 @@
 ---
+- name: Restart firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded
+
 - name: Remove Jenkins init scripts
   ansible.builtin.file:
     path: "{{ jenkins_home }}/init.groovy.d/basic-security.groovy"
@@ -8,3 +13,9 @@
   ansible.builtin.systemd:
     name: jenkins
     state: restarted
+
+- name: Remove local SSH keypair
+  ansible.builtin.file:
+    path: ~/.ssh/jenkins/
+    state: absent
+  delegate_to: localhost

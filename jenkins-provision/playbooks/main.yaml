@@ -1,0 +1,27 @@
+---
+- name: Provision Jenkins server
+  hosts: jenkins_master
+  become: true
+  gather_facts: true
+  vars_files:
+  - vars.yaml
+  - vars-jenkins-plugins.yaml
+  roles:
+  - java
+  - firewall
+  - jenkins-master
+  handlers:
+  - ansible.builtin.import_tasks: handlers/main.yaml
+
+- name: Provision Jenkins agents
+  hosts: jenkins_agents
+  become: true
+  gather_facts: true
+  vars_files:
+  - vars.yaml
+  - vars-jenkins-plugins.yaml
+  roles:
+  - java
+  - jenkins-agent
+  handlers:
+  - ansible.builtin.import_tasks: handlers/main.yaml

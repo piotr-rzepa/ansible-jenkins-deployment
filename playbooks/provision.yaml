@@ -1,9 +1,0 @@
----
-- name: Provision Jenkins server
-  hosts: jenkins_master
-  become: true
-  gather_facts: true
-  roles:
-  - java
-  - firewall
-  - jenkins
